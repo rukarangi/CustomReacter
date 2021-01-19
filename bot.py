@@ -42,6 +42,7 @@ async def displayCommands(channel, m):
 	embedMsg = discord.Embed(title="", description="List of Commmands:", color=0x00ff00)
 	for key, com in m.items():
 		embedMsg.add_field(name="$"+key, value=str(com.__doc__), inline=False)
+	embedMsg.add_field(name="Source:", value="https://github.com/rukarangi/CustomReacter", inline=False)
 	await channel.send(embed=embedMsg)
 
 
