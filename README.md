@@ -6,5 +6,5 @@ This bot will allow a server admin to have certain users be reacted to by this b
 It is currently in W.I.P
 
 ### Current Features
-*Useful help command
-*Test command for connectivity
+* Useful help command
+* Test command for connectivity
