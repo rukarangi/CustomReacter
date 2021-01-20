@@ -8,3 +8,5 @@ It is currently in W.I.P
 ### Current Features
 * Useful help command
 * Test command for connectivity
+* Admin only commands
+* Link with a local Database
