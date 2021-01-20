@@ -2,6 +2,8 @@ import discord
 import os
 import re
 
+from database import dbSession, User
+
 client = discord.Client()
 
 print(re.search("\$\w+\s*", "$helo"))
@@ -37,7 +39,6 @@ async def on_message(message):
 
 
 
-
 async def displayCommands(channel, m):
 	embedMsg = discord.Embed(title="", description="List of Commmands:", color=0x00ff00)
 	for key, com in m.items():
@@ -58,8 +59,42 @@ async def info(message, m):
 	"""
 	This displays this
 	"""
-	#await message.channel.send("This bot is a test of some discord.py functionalities: use $hello to see a reaction.")
 	await displayCommands(message.channel, m)
+	return
+
+async def listUsers(message, m):
+	"""
+	Print out all users saved to db --Admin only
+	"""
+	admin = message.channel.permissions_for(message.author).administrator
+	if admin:
+		users = dbSession.query(User)
+		msg = [user.as_dict() for user in users]
+		print(msg)
+	else:
+		await message.channel.send("You do not have permission to use that command.")
+
+	return
+
+async def clearUsers(message, m):
+	"""
+	Print out all users saved to db --Admin only
+	"""
+	admin = message.channel.permissions_for(message.author).administrator
+	if admin:
+		dbSession.query(User).delete()
+		dbSession.commit()
+		await message.channel.send("Database has been removed of users.")
+	else:
+		await message.channel.send("You do not have permission to use that command.")
+
+	return
+
+def addUser(name, id, admin):
+	user = User(name=name, id=id, admin=admin)
+	dbSession.add(user)
+	dbSession.commit()
+	print(f"added user: {user}")
 	return
 
 async def badCommand(message, m):
@@ -68,7 +103,8 @@ async def badCommand(message, m):
 
 messages = {
 	"hello": hello,
-	"help": info
+	"help": info,
+	"list": listUsers
 }
 
 
@@ -79,8 +115,7 @@ async def messageHandler(message):
 	
 	#print(f'{author} admin:({admin}) : {content}')
 
-	command = message.content[1:5]
-	#print(re.search("\$\w+\s*", content))
+	#command = message.content[1:5]
 	command = re.search("\$\w+\s*", content).group()[1:]
 	#print(command)
 	command = "".join([s for s in command if s != " "])
@@ -89,10 +124,6 @@ async def messageHandler(message):
 	func = messages.get(command, badCommand)
 	await func(message, messages)
 
-
-	#if message.content[1:5] == "hello":
-	#	await message.channel.send("hello")
-	#	await message.add_reaction("😀")
 	return
 
 client.run(key)
