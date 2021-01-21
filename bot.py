@@ -39,7 +39,12 @@ async def on_message(message):
 
 @client.event
 async def on_reaction_add(reaction, user):
-	pass
+	print(user.id)
+	msg = reaction.message
+	print(msg.channel)
+	if msg.author == client.user:
+		await msg.channel.send("You reacted to me!")
+	return
 
 
 async def displayCommands(channel, m):
