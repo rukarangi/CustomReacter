@@ -37,6 +37,9 @@ async def on_message(message):
 			await message.add_reaction("🇷")
 			await message.add_reaction("💩")
 
+@client.event
+async def on_reaction_add(reaction, user):
+	pass
 
 
 async def displayCommands(channel, m):
