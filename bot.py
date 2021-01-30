@@ -102,6 +102,17 @@ async def deleteUser(message, m):
 		command = re.search("\$\w+\s\w+$", content).group()[1:]
 		name = command.split(" ")[1]
 
+		user = dbSession.query(User).filter_by(name=name).first()
+
+		#print(user)
+
+		if user:
+			dbSession.query(User).filter_by(name=name).delete()
+			dbSession.commit()
+		else:
+			await message.channel.send("This user does not exist")
+
+
 		print(command, name)
 	else:
 		await message.channel.send("You do not have permission to use that command.")
