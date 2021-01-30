@@ -4,6 +4,8 @@ import re
 
 from database import dbSession, User
 
+from actions import addUser
+
 client = discord.Client()
 
 print(re.search("\$\w+\s*", "$helo"))
@@ -44,6 +46,12 @@ async def on_reaction_add(reaction, user):
 	print(msg.channel)
 	if msg.author == client.user:
 		await msg.channel.send("You reacted to me!")
+
+	name = user.name
+	discordID = user.id
+	admin = msg.channel.permissions_for(user).administrator
+
+	addUser(name, discordID, admin)
 	return
 
 
@@ -84,6 +92,24 @@ async def listUsers(message, m):
 
 	return
 
+async def deleteUser(message, m):
+	"""
+	Delete user by name --Admin only
+	"""
+	admin = message.channel.permissions_for(message.author).administrator
+	if admin:
+		content = message.content
+		command = re.search("\$\w+\s\w+$", content).group()[1:]
+		name = command.split(" ")[1]
+
+		print(command, name)
+	else:
+		await message.channel.send("You do not have permission to use that command.")
+
+
+
+	return
+
 async def clearUsers(message, m):
 	"""
 	Print out all users saved to db --Admin only
@@ -98,12 +124,7 @@ async def clearUsers(message, m):
 
 	return
 
-def addUser(name, id, admin):
-	user = User(name=name, id=id, admin=admin)
-	dbSession.add(user)
-	dbSession.commit()
-	print(f"added user: {user}")
-	return
+
 
 async def badCommand(message, m):
 	await message.channel.send("That is not a command i recognise, try '$help'")
@@ -112,7 +133,9 @@ async def badCommand(message, m):
 messages = {
 	"hello": hello,
 	"help": info,
-	"list": listUsers
+	"list": listUsers,
+	"delete": deleteUser,
+	"clear": clearUsers
 }
 
 
@@ -121,13 +144,13 @@ async def messageHandler(message):
 	author = message.author
 	admin = message.channel.permissions_for(author).administrator
 	
-	#print(f'{author} admin:({admin}) : {content}')
+	print(f'{author} admin:({admin}) : {content}')
 
 	#command = message.content[1:5]
 	command = re.search("\$\w+\s*", content).group()[1:]
 	#print(command)
 	command = "".join([s for s in command if s != " "])
-	#print(command)
+	print(command)
 
 	func = messages.get(command, badCommand)
 	await func(message, messages)

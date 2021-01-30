@@ -10,7 +10,7 @@ users = Table(
 	Column('id', Integer, primary_key=True),
 	Column('name', String(20), nullable = False),
 	Column('discordid', Integer, unique=True, nullable = False),
-	Column('admin', Boolean),
+	Column('admin', Boolean, nullable = False),
 )
 
 meta.create_all(engine)
